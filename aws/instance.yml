@@ -1,0 +1,44 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    user_ssh: "ec2-user" # for ami2  
+    key_path: "/home/vagrant/.ssh/"
+    key_file: devtools
+    region: us-east-2
+    image: ami-00bf61217e296b409 # ami2 on us-east-2
+    instance_type: "t2.micro"
+    instance_name: "{{ name_of_instance }}"
+    name_of_instance_lower: "{{ name_of_instance | lower }}"
+    sec_group: "{{ instance_name }}-sec"
+    hosts_ansible_file: "/home/vagrant/GraduationWork/hosts"
+    allow_ip: "{{ allow_ip | default('127.0.0.1') }}"
+    workzone: ci-cd.net.ua
+    dnsttl: 15
+    route53_action: present
+  
+  pre_tasks:
+    - name: set variable depends on tags for route53
+      set_fact:
+        route53_action=absent
+      tags: stop
+    
+    #- debug:
+    #    msg: "{{ route53_action }}"
+    #  tags: stop
+
+  roles:
+
+    - { role: upload_key, tags: upload_key }
+    - { role: create, tags: create }
+    - { role: get_facts, tags: always }
+    - { role: stop, tags: stop }
+    - { role: start, tags: start }    
+    - { role: delete, tags: delete }
+    - { role: ip_ansible_ssh, tags: [ 'ip_ansible_ssh', 'create', 'start' ] }
+    - { role: route53, tags: [ 'route53', 'create', 'start', 'stop' ]}
+    - { role: sg_default, tags: sg_default }
+    - { role: sg_ip, tags: [ 'sg_ip', 'create' ]}
+    - { role: sg_ip_port, tags: [ 'sg_ip_port', 'create' ]}

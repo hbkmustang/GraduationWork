@@ -1,0 +1,32 @@
+---
+- name: delete existing content from /usr/local/GraduationWork
+  file:
+    path: /usr/local/GraduationWork
+    state: absent
+  become: yes
+
+- name: copy files to /tmp/
+  copy:
+    src: gradwork.tar.gz
+    dest: /tmp/
+    #owner: root
+    #group: root
+    mode: '0600'
+
+- name: create a directory if it does not exist
+  file:
+    path: /usr/local/GraduationWork
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: '0755'
+  become: yes
+    
+- name: unarchive files to /usr/local/GraduationWork
+  unarchive:
+    src: /tmp/gradwork.tar.gz
+    dest: /usr/local/
+    remote_src: yes
+    owner: jenkins
+    group: jenkins
+  become: yes

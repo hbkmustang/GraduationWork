@@ -1,0 +1,38 @@
+---
+- name: is maven already installed 
+  shell: "mvn -version | grep -w 'Apache Maven' | awk '{print $3}'"
+  register: maven_installed
+ 
+- name: installed maven version
+  debug: "msg={{maven_installed.stdout}}"
+
+- block:
+  - name: download and unarchive maven
+    unarchive:
+      src: "http://www.apache.org/dist/maven/maven-{{ maven_major }}/{{ maven_version }}/binaries/apache-maven-{{ maven_version }}-bin.tar.gz"
+      dest: "{{maven_home_parent_directory}}"
+      copy: no
+    become: yes
+
+  - name: create maven symlink to /usr/bin
+    file:
+      src: "{{maven_home_parent_directory}}/apache-maven-{{maven_version}}/bin/mvn"
+      dest: /usr/bin/mvn
+      state: link
+    become: yes
+    
+  - name: configure maven and its environment variables
+    lineinfile:
+      dest: "{{maven_env_file}}"
+      line: "{{ item.line }}"
+      create: yes
+      state: present
+    become: yes
+    with_items:
+      - { line: 'M2_HOME={{maven_home_parent_directory}}/apache-maven-{{maven_version}}' }
+      - { line: 'PATH=$PATH:$M2_HOME/bin' }
+ 
+  - name: exports/Run maven env file for make M2_HOME available globally
+    shell: "source {{maven_env_file}}"
+
+  when: maven_installed.stdout == ""

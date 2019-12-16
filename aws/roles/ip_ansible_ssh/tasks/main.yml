@@ -1,0 +1,17 @@
+---
+- name: repeat get_fact.yml if do not have enough new data (after start instance or create)
+  include_role:
+    name: get_facts
+  when: ip_address_private is not defined
+
+- name: Change line ansible hosts with write parameters
+  lineinfile:
+    backrefs: true
+    dest: "{{ hosts_ansible_file }}"
+    regexp: '^{{ name_of_instance_lower }} ansible_host='
+    line: "{{ name_of_instance_lower }} ansible_host={{ ip_address }} ansible_user={{ user_ssh }} ansible_private_key_file={{ key_path }}{{ key_file }} ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_python_interpreter='/usr/bin/python'"
+  # register: ansible_hosts
+
+- debug:
+    msg:
+      - "ssh -o 'StrictHostKeyChecking no' -i {{ key_path }}{{ key_file }} {{ user_ssh }}@{{ ip_address }}"

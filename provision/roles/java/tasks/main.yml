@@ -1,0 +1,8 @@
+---
+- name: install Java 1.8 
+  yum:
+    name:
+      - java-1.8.0-openjdk
+      - java-1.8.0-openjdk-devel
+    state: latest
+  become: yes

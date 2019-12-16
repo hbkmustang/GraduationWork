@@ -1,0 +1,21 @@
+---
+- name: "add rules to port 8080 from github to security group for {{ name_of_instance }}"
+  ec2_group:
+    name: "{{ sec_group }}"
+    description: "Sec group for {{ instance_name }}"
+    # vpc_id: 12345
+    region: "{{ region }}"
+    aws_access_key: "{{ec2_access_key}}"
+    aws_secret_key: "{{ec2_secret_key}}"
+    purge_rules: no
+    rules:
+      - proto: tcp
+        ports: 8080
+        cidr_ip: "{{ item }}"
+        # rule_desc: ""
+        # group_name:
+        #  - "{{ sec_group }}"
+        # group_id: "{{ result_sec_group.group_id }}"
+  # register: result_sec_group
+  with_lines: cat {{ ip_port_file }}
+  

@@ -1,0 +1,38 @@
+---
+- name: Create security group
+  ec2_group:
+    name: "{{ sec_group }}"
+    description: "Sec group for {{ instance_name }}"
+    # vpc_id: 12345
+    region: "{{ region }}"
+    aws_access_key: "{{ec2_access_key}}"
+    aws_secret_key: "{{ec2_secret_key}}"
+    # Rules will be added with tag from allow ip
+    # rules:
+    #  - proto: tcp
+    #    ports:
+    #      - 22
+    #    cidr_ip: 0.0.0.0/0
+    #    rule_desc: allow all on ssh port
+  register: result_sec_group
+
+- name: "create and provision instance(s) {{ name_of_instance }}"
+  ec2:
+    aws_access_key: "{{ec2_access_key}}"
+    aws_secret_key: "{{ec2_secret_key}}"
+    key_name: "{{ key_file }}"
+    instance_tags:
+      Name: "{{ instance_name }}"
+    # id: "{{ instance_name }}" # idempotential self-assigned
+    group_id: "{{ result_sec_group.group_id }}" # security group id
+    image: "{{ image }}"
+    instance_type: "{{ instance_type }}"
+    monitoring: no
+    # zone: "{{ zone }}"
+    region: "{{ region }}"
+    wait: true
+    count: 1
+    # exact_count: 2
+    # count_tag:
+    #   Name: App
+    # assign_public_ip: yes

@@ -1,0 +1,48 @@
+---
+# - name: include variables
+#   include_vars: "system.yml"
+
+#- name: ensure dependencies are installed
+#  package:
+#    name:
+#      - curl
+#      - libselinux-python
+#      - initscripts
+#    state: present
+#  become: yes
+
+- name: ensure Jenkins repo is installed
+  get_url:
+    url: "{{ jenkins_repo_url }}"
+    dest: /etc/yum.repos.d/jenkins.repo
+  become: yes
+  when: jenkins_repo_url != ""
+
+- name: add Jenkins repo GPG key
+  rpm_key:
+    state: present
+    key: "{{ jenkins_repo_key_url }}"
+  become: yes
+  when: jenkins_repo_url != ''
+
+- name: Jenkins install
+  yum:
+    name: jenkins
+    state: latest
+  become: yes
+
+- name: change owner for "{{ jenkins_home }}"
+  file:
+    path: "{{ jenkins_home }}"
+    recurse: yes
+    state: directory
+    owner: "{{ jenkins_process_user }}"
+    group: "{{ jenkins_process_user }}"
+  become: yes
+
+- name: enable service jenkins
+  systemd:
+    name: jenkins
+    enabled: yes
+    # state: started
+  become: yes

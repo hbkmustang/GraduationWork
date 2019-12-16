@@ -1,0 +1,66 @@
+---
+- name: stop Jenkins
+  systemd:
+    name: jenkins
+    state: stopped
+  become: yes
+  ignore_errors: yes
+    
+- name: delete existing work directory of Jenkins
+  file:
+    path: /var/lib/jenkins
+    state: absent
+  become: yes
+
+- name: copy files to /tmp
+  copy:
+    src: jenkins.tar.gz
+    dest: /tmp/
+    # owner: jenkins # can't before install and create user jenkins
+    # group: jenkins
+    mode: '0600'
+
+- name: create directory {{ jenkins_home }}
+  file:
+    path: /var/lib/jenkins
+    state: directory
+    mode: '0755'
+    owner: jenkins
+    group: jenkins
+  become: yes
+
+- name: unarchive files to /var/lib
+  unarchive:
+    src: /tmp/jenkins.tar.gz
+    dest: /var/lib/
+    remote_src: yes
+    owner: jenkins
+    group: jenkins
+  become: yes
+
+- name: add user jenkins for docker group
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+  become: yes
+
+- name: start Jenkins
+  systemd:
+    name: jenkins
+    state: started
+  become: yes
+
+
+#- name: Jenkins start
+#  systemd:
+#    name: jenkins
+#    state: started
+    
+#- name: Wait for up Service
+#  wait_for:
+#    host: 0.0.0.0
+#    port: 8080
+#    delay: 5
+#    state: started
+#    timeout: 60

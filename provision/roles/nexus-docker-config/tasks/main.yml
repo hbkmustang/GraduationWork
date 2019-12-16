@@ -1,0 +1,45 @@
+---
+- name: stop Docker
+  systemd:
+    name: docker
+    state: stopped
+  # become: yes
+  ignore_errors: yes
+
+- name: delete existing volume for nexus-data
+  file:
+    path: /var/lib/docker/volumes/nexus-data
+    state: absent
+  # become: yes
+
+- name: copy files to /var/lib/docker/volumes/
+  copy:
+    src: nexus-data.tar.gz
+    dest: /tmp/
+    mode: '0600'
+    # owner: root
+    # group: root
+  # become: yes
+
+- name: unarchive files to /var/lib with uid 200 and gid 200
+  unarchive:
+    src: /tmp/nexus-data.tar.gz
+    dest: /var/lib/docker/volumes/
+    remote_src: yes
+    owner: '200'
+    group: '200'
+  # become: yes
+
+- name: set /var/lib/docker/volumes/nexus-data owner and group to root
+  file:
+    path: /var/lib/docker/volumes/nexus-data
+    owner: root
+    group: root
+    recurse: no
+  # become: yes
+
+- name: docker start
+  systemd:
+    name: docker
+    state: started
+  # become: yes

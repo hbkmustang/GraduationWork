@@ -1,0 +1,4 @@
+ip_file_default: ip-list-default
+ip_port_file: ip-list-github-webhook
+ip_file: ip-list
+route53_type: A

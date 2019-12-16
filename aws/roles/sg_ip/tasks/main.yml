@@ -1,0 +1,19 @@
+---
+- name: "add rules to security group for {{ name_of_instance }}"
+  ec2_group:
+    name: "{{ sec_group }}"
+    description: "Sec group for {{ instance_name }}"
+    region: "{{ region }}"
+    # group_id: sg-00b48667a45ce7eba
+    aws_access_key: "{{ec2_access_key}}"
+    aws_secret_key: "{{ec2_secret_key}}"
+    purge_rules: no
+    # vpc_id: vpc-1b10e370
+    rules:
+      - proto: all
+        cidr_ip: "{{ item }}"
+        # rule_desc: ""
+        #group_name:
+        #  - "{{ sec_group }}"
+  # register: result_sec_group
+  with_lines: cat {{ ip_file }}

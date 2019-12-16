@@ -1,0 +1,47 @@
+---
+#- name: Install yum utils
+#  yum:
+#    name: "{{ item }}"
+#    state: latest
+#  loop: 
+#    - yum-utils
+#    - lvm2
+#    - device-mapper-persistent-data
+
+
+#- name: install/update packets
+#  yum:
+#    name:
+#      - python3
+#      - python
+#      # - python-dev
+#      - python-pip
+#      - python3-pip
+#    state: latest
+
+#- name: install docker-py
+#  command: "{{ item }}"
+#  loop:
+#    # - docker
+#    - pip install docker-py
+#    - pip3 install docker
+
+- name: install Docker
+  yum:
+    name: docker
+    state: latest
+  become: yes
+
+- name: start Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: add user ec2-user to docker group
+  user:
+    name: ec2-user
+    groups: docker
+    append: yes
+  become: yes    

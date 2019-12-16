@@ -1,0 +1,53 @@
+---
+#- name: Install epel-release 
+#  command: amazon-linux-extras install epel -y
+#  register: result
+
+#- debug:
+#    msg: "{{ result }}"     
+
+#- name: Install "Development Tools"
+#  yum:
+#    name: "@Development tools"
+#    state: latest
+#  register: result
+
+#- debug:
+#    msg: "{{ result }}"     
+
+#- name: Install required packets
+#  yum:
+#    name: gettext-devel, openssl-devel, perl-CPAN, perl-devel, zlib-devel
+#    state: latest
+#  register: result
+
+#- debug:
+#    msg: "{{ result }}"     
+
+#- name: Install required repository
+#  yum:
+#    name: https://centos7.iuscommunity.org/ius-release.rpm 
+#    state: latest
+#  register: result
+
+#- debug:
+#    msg: "{{ result }}"     
+
+# - name: Install git
+#  yum:
+#    name: git2u-all
+#    state: latest
+#  register: result
+
+# - debug:
+#    msg: "{{ result }}"     
+
+- name: Install git
+  yum:
+    name: git
+    state: latest
+  become: yes
+  # register: result
+
+#- debug:
+#    msg: "{{ result }}"     

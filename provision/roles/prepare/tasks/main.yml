@@ -1,0 +1,50 @@
+---
+- name: Install epel-release using amazon tools on Amazon System
+  command: amazon-linux-extras install epel -y
+  become: yes
+
+- name: Install packets, repositories, libraries for depencies
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: yes 
+  loop:
+    #- python
+    #- python3
+    # - python-dev
+    - python-pip
+    #- python3-pip
+    #- curl
+    #- libselinux-python
+    #- initscripts
+    #- gettext-devel
+    #- openssl-devel
+    #- perl-CPAN
+    #- perl-devel
+    #- zlib-devel
+    - telnet
+    - joe
+    - mc
+
+- name: Install python differents
+  command: "{{ item }}"
+  become: yes
+  loop:
+    #- pip install --upgrade pip
+    - pip install boto
+    - pip install boto3
+    - pip install docker
+    #- pip install docker-py
+    #- pip3 install --upgrade pip
+    #- pip3 install boto
+    #- pip3 install boto3
+    #- pip3 install docker
+    # - pip3 install docker-py
+
+#- name: Install packets, repositories, libraries for depencies
+#  yum:
+#    name:
+#    - "@Development tools"
+#    - "https://centos7.iuscommunity.org/ius-release.rpm"
+#    state: present
+#  become: yes 

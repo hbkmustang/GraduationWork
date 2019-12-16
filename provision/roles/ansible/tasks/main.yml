@@ -1,0 +1,40 @@
+---
+#- name: what system ?
+#  shell: "cat /etc/system-release | awk -F ' ' '{print $1}'"
+#  register: what_system
+ 
+#- debug:
+#    msg: "{{ what_system }}"     
+ 
+#- name: Install epel-release using amazon tools on Amazon System
+#  command: amazon-linux-extras install epel -y
+#  when: what_system.stdout == "Amazon"
+#  register: result
+
+#- name: Install epel-release on CentOS System
+#  yum: 
+#    name: epel-release
+#    state: present
+#  when: what_system.stdout == "CentOS"
+#  register: result
+
+#- debug:
+#    msg: "{{ result }}"     
+
+- name: Install Ansible latest version from epel repository
+  yum:
+    name: ansible
+    state: latest
+  become: yes
+#  register: result
+
+#- debug:
+#    msg: "{{ result }}"     
+
+#- name: Install python for AWS
+#  command: "{{ item }}"
+#  loop:
+#    #- pip install boto
+#    #- pip install boto3
+#    - pip3 install boto
+#    - pip3 install boto3

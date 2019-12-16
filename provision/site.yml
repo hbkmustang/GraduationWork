@@ -1,0 +1,128 @@
+---
+- name: P R O V I S I O N I N G
+  hosts: all
+  gather_facts: no
+  become_method: sudo
+
+  tasks:
+    - name: I N S T A L L   R E Q U I R E D   P A C K E T S
+      include_role:
+        name: prepare
+        apply:
+          tags:
+            - prepare
+      tags: 
+        - always
+
+    - name: I N S T A L L   J A V A
+      include_role:
+        name: java
+        apply:
+          tags:
+            - java
+      tags:
+        - always
+      
+    - name: I N S T A L L   A N S I B L E
+      include_role:
+        name: ansible
+        apply:
+          tags:
+            - ansible
+      tags:
+        - always
+      
+    - name: I N S T A L L   G I T
+      include_role:
+        name: git
+        apply:
+          tags:
+            - git
+      tags:
+        - always
+
+    - name: D O C K E R   I N S T A L L
+      include_role:
+        name: docker
+        apply:
+          tags:
+            - docker
+      tags:
+        - always
+
+    - name: N E X U S   C O P Y   C O N F I G S
+      include_role:
+        name: nexus-docker-config
+        apply:
+          tags:
+            - nexus-docker-config
+          become: yes
+      tags:
+        - always
+      
+    - name: N E X U S   D O C K E R   I N S T A L L
+      include_role:
+        name: nexus-docker
+        apply:
+          tags:
+            - nexus-docker
+      tags:
+        - always
+      
+    - name: I N S T A L L   J E N K I N S
+      include_role:
+        name: jenkins-install
+        apply:
+          tags:
+            - jenkins-install
+      tags:
+        - always
+      
+    - name: J E N K I N S   C O N F I G S
+      include_role:
+        name: jenkins-config
+        apply:
+          tags:
+            - jenkins-config
+      tags:
+        - always
+    
+    - name: C O P Y I N G   S C R I P T S
+      include_role:
+        name: grad-work
+        apply:
+          tags:
+            - grad-work
+      tags:
+        - always
+
+    - name: I N S T A L L   M A V E N
+      include_role:
+        name: maven
+        apply:
+          tags:
+            - maven
+      tags:
+        - always
+
+    - name: "copy file ips-nets to {{ inventory_hostname }}"
+      copy:
+        src: ../aws/ip-list
+        dest: /usr/local/GraduationWork/
+        owner: jenkins
+        group: jenkins
+        mode: '0666'
+      become: yes
+      tags: copy_ips
+
+    - name: "set hostname to {{ inventory_hostname }}"
+      command: "hostnamectl set-hostname {{ inventory_hostname }}"
+      become: yes
+      tags: set_hostname
+
+    - name: " set ip {{ inventory_hostname }} in hosts on {{ inventory_hostname }}"
+      shell: "cd /usr/local/GraduationWork && ansible-playbook aws/instance.yml --vault-password-file aws/vault.pass -e name_of_instance={{ inventory_hostname }} -t ip_ansible_ssh"
+      become: yes
+      tags: set_ip_in_hosts
+    
+ 

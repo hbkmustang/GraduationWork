@@ -1,0 +1,27 @@
+---
+- name: Get instance facts
+  ec2_instance_facts:
+    aws_access_key: "{{ec2_access_key}}"
+    aws_secret_key: "{{ec2_secret_key}}"
+    region: "{{ region }}"
+    filters:
+      "tag:Name": "{{ name_of_instance }}"
+  register: facts_result
+
+# - debug:
+#    msg: "{{ facts_result.instances }}"
+
+- set_fact:
+    instance_id="{{ facts_result.instances[0].instance_id }}"
+  when: facts_result.instances[0].instance_id is defined
+
+- set_fact:
+    ip_address="{{ facts_result.instances[0].public_ip_address }}"
+    ip_address_private="{{ facts_result.instances[0].private_ip_address }}"
+  when: facts_result.instances[0].public_ip_address is defined
+
+# - name: Instances ID
+#   debug:
+#    msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }}"
+#    # msg: "{{ item }}"
+#  loop: "{{ fact_result.instances }}"
